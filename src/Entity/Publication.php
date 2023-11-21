@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PublicationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,15 +28,20 @@ class Publication
     #[ORM\Column]
     private ?bool $isLocked = null;
 
-    #[ORM\Column]
-    private ?int $likesCount = null;
-
-    #[ORM\Column]
-    private ?int $dislikesCount = null;
-
     #[ORM\ManyToOne(inversedBy: 'publications')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $auteur = null;
+
+    #[ORM\OneToMany(mappedBy: 'publication', targetEntity: Commentaire::class, orphanRemoval: true)]
+    private Collection $commentaires;
+
+    #[ORM\OneToOne(mappedBy: 'publication', cascade: ['persist', 'remove'])]
+    private ?RatingPublication $ratingPublication = null;
+
+    public function __construct()
+    {
+        $this->commentaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -89,29 +96,6 @@ class Publication
         return $this;
     }
 
-    public function getLikesCount(): ?int
-    {
-        return $this->likesCount;
-    }
-
-    public function setLikesCount(int $likesCount): static
-    {
-        $this->likesCount = $likesCount;
-
-        return $this;
-    }
-
-    public function getDislikesCount(): ?int
-    {
-        return $this->dislikesCount;
-    }
-
-    public function setDislikesCount(int $dislikesCount): static
-    {
-        $this->dislikesCount = $dislikesCount;
-
-        return $this;
-    }
 
     public function getAuteur(): ?User
     {
@@ -124,4 +108,52 @@ class Publication
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setPublication($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getPublication() === $this) {
+                $commentaire->setPublication(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRatingPublication(): ?RatingPublication
+    {
+        return $this->ratingPublication;
+    }
+
+    public function setRatingPublication(RatingPublication $ratingPublication): static
+    {
+        // set the owning side of the relation if necessary
+        if ($ratingPublication->getPublication() !== $this) {
+            $ratingPublication->setPublication($this);
+        }
+
+        $this->ratingPublication = $ratingPublication;
+
+        return $this;
+    }
+
 }

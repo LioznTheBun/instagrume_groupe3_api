@@ -20,12 +20,6 @@ class Commentaire
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateComm = null;
 
-    #[ORM\Column]
-    private ?int $likesCount = null;
-
-    #[ORM\Column]
-    private ?int $dislikesCount = null;
-
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $auteur = null;
@@ -33,6 +27,13 @@ class Commentaire
     #[ORM\OneToOne(targetEntity: Commentaire::class)]
     #[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true)]
     private ?Commentaire $commentaire = null;
+
+    #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Publication $publication = null;
+
+    #[ORM\OneToOne(mappedBy: 'commentaire', cascade: ['persist', 'remove'])]
+    private ?RatingCommentaire $ratingCommentaire = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -62,30 +63,6 @@ class Commentaire
         return $this;
     }
 
-    public function getLikesCount(): ?int
-    {
-        return $this->likesCount;
-    }
-
-    public function setLikesCount(int $likesCount): static
-    {
-        $this->likesCount = $likesCount;
-
-        return $this;
-    }
-
-    public function getDislikesCount(): ?int
-    {
-        return $this->dislikesCount;
-    }
-
-    public function setDislikesCount(int $dislikesCount): static
-    {
-        $this->dislikesCount = $dislikesCount;
-
-        return $this;
-    }
-
     public function getAuteur(): ?User
     {
         return $this->auteur;
@@ -106,6 +83,35 @@ class Commentaire
     public function setCommentaire(?self $commentaire): static
     {
         $this->commentaire = $commentaire;
+
+        return $this;
+    }
+
+    public function getPublication(): ?Publication
+    {
+        return $this->publication;
+    }
+
+    public function setPublication(?Publication $publication): static
+    {
+        $this->publication = $publication;
+
+        return $this;
+    }
+
+    public function getRatingCommentaire(): ?RatingCommentaire
+    {
+        return $this->ratingCommentaire;
+    }
+
+    public function setRatingCommentaire(RatingCommentaire $ratingCommentaire): static
+    {
+        // set the owning side of the relation if necessary
+        if ($ratingCommentaire->getCommentaire() !== $this) {
+            $ratingCommentaire->setCommentaire($this);
+        }
+
+        $this->ratingCommentaire = $ratingCommentaire;
 
         return $this;
     }
