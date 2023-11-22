@@ -53,7 +53,7 @@ class UserController extends AbstractController
             ]
         )
     )]
-    #[OA\Tag(name: 'utilisateurs')]
+    #[OA\Tag(name: 'Utilisateurs')]
     public function logUser(ManagerRegistry $doctrine, JWTTokenManagerInterface $JWTManager)
     {
         $request = Request::createFromGlobals();
@@ -84,7 +84,7 @@ class UserController extends AbstractController
         description: 'L\'utilisateur correspondant au token passé dans le header',
         content: new OA\JsonContent(ref: new Model(type: User::class))
     )]
-    #[OA\Tag(name: 'utilisateurs')]
+    #[OA\Tag(name: 'Utilisateurs')]
     public function getUtilisateur(JWTEncoderInterface $jwtEncoder, Request $request)
     {
         $tokenString = str_replace('Bearer ', '', $request->headers->get('Authorization'));
@@ -104,7 +104,7 @@ class UserController extends AbstractController
             items: new OA\Items(ref: new Model(type: User::class))
         )
     )]
-    #[OA\Tag(name: 'utilisateurs')]
+    #[OA\Tag(name: 'Utilisateurs')]
     public function getAllUsers(ManagerRegistry $doctrine)
     {
 
