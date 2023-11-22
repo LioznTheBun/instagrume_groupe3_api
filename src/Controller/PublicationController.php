@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Service\JsonConverter;
 use App\Entity\Publication;
+use App\Entity\User;
+use App\Entity\RatingPublication;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -47,10 +49,11 @@ class PublicationController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'id', type: 'number'),
                 new OA\Property(property: 'photo', type: 'string'),
                 new OA\Property(property: 'datePublication', type: 'datetime'),
-                new OA\Property(property: 'population', type: 'integer')
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'isLocked', type: 'boolean', default: false),
+                new OA\Property(property: 'auteur', type: 'string')
             ]
         )
     )]
@@ -59,16 +62,42 @@ class PublicationController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'nom', type: 'string'),
-                new OA\Property(property: 'superficie', type: 'number'),
-                new OA\Property(property: 'population', type: 'integer')
+                new OA\Property(property: 'photo', type: 'string'),
+                new OA\Property(property: 'datePublication', type: 'datetime', default: ''),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'isLocked', type: 'boolean', default: false),
+                new OA\Property(property: 'auteur', type: 'string', default: 'admin'),
             ]
         )
     )]
     #[OA\Tag(name: 'Publications')]
-    public function createPublication()
+    public function createPublication(ManagerRegistry $doctrine)
     {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
 
+        $userRepo = $entityManager->getRepository(User::class);
+        $auteur = $userRepo->findOneBy(['pseudo' => $data['auteur']]);
+
+        $publication = new Publication();
+        $publication->setAuteur($auteur);
+        $publication->setDescription($data['description']);
+        $publication->setDatePublication(new \DateTime($data['datePublication']));
+        $publication->setIsLocked($data['isLocked']);
+        $publication->setPhoto($data['photo']);
+
+        $ratingPublication = new RatingPublication();
+        $ratingPublication->setLikesCount(0);
+        $ratingPublication->setDislikesCount(0);
+        $ratingPublication->setPublication($publication);
+
+
+        $entityManager->persist($publication);
+        $entityManager->persist($ratingPublication);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($publication));
     }
 
 }
