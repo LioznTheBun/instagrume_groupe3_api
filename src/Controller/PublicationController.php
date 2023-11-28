@@ -99,5 +99,72 @@ class PublicationController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($publication));
     }
+    //A MODIFIER ET ADAPTER ---------------------------------------------------------------------
+    #[Route('/api/publications', methods: ['PUT'])]
+    #[OA\Put(description: "Modifie la description d'une publication et retourne ses informations")]
+    #[OA\Response(
+        response: 200,
+        description: 'La description mise à jour',
+        content: new OA\JsonContent(ref: new Model(type: Publication::class))
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'id', type: 'string'),
+                new OA\Property(property: 'description', type: 'string')
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Publications')]
+    public function updateDescriptionPublication(ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+
+        $publication = $doctrine->getRepository(Publication::class)->find($data['id']);
+
+        if (!$publication) {
+            throw $this->createNotFoundException(
+                'Pas de publication'
+            );
+        }
+
+        $publication->setDescription($data['description']);
+
+        $entityManager->persist($publication);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($publication));
+    }
+
+    #[Route('/api/publications/{id}', methods: ['DELETE'])]
+    #[OA\Delete(description: "Supprime une photo d'une publication correspondant à un identifiant")]
+    #[OA\Response(
+        response: 200,
+        description: 'La photo supprimée',
+        content: new OA\JsonContent(ref: new Model(type: Publication::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'une photo'
+    )]
+    #[OA\Tag(name: 'Publications')]
+    public function deletePhoto(ManagerRegistry $doctrine, $id)
+    {
+        $entityManager = $doctrine->getManager();
+
+        $publication = $entityManager->getRepository(Publication::class)->find($id);
+
+        $entityManager->remove($publication);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($publication));
+    }
 
 }
