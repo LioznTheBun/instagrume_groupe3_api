@@ -139,5 +139,50 @@ class UserController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($user));
     }
 
+    #[Route('/api/createUser', methods: ['POST'])]
+    #[OA\Post(description: 'Crée un nouvel utilisateur et retourne ses informations')]
+    #[OA\Response(
+        response: 200,
+        description: 'Le nouvel utilisateur crée',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'email', type: 'string'),
+                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string')),
+                new OA\Property(property: 'password', type: 'string', default: 'password'),
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'pseudo', type: 'string'),
+                new OA\Property(property: 'is_banned', type: 'boolean', default: false)
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function createUser(ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+
+        $user = new User();
+        $user->setEmail($data['email']);
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+        $user->setPassword($hashedPassword);
+        $user->setAvatar($data['avatar']);
+        $user->setPseudo($data['pseudo']);
+        $user->setIsBanned($data['is_banned']);
+        $user->setRoles($data['roles']);
+
+
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
 
 }
