@@ -113,4 +113,31 @@ class UserController extends AbstractController
         $users = $entityManager->getRepository(User::class)->findAll();
         return new Response($this->jsonConverter->encodeToJson($users));
     }
+
+    #[Route('/api/utilisateurs/{pseudo}', methods: ['GET'])]
+    #[OA\Get(description: 'Retourne les informations d\'un utilisateur correspondant à un pseudo')]
+    #[OA\Response(
+        response: 200,
+        description: 'Les informations d\'un utilisateur',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\Parameter(
+        name: 'pseudo',
+        in: 'path',
+        schema: new OA\Schema(type: 'string'),
+        required: true,
+        description: 'Le pseudo d\'un utilisateur'
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function getUserByPseudo(ManagerRegistry $doctrine, $pseudo)
+    {
+        $entityManager = $doctrine->getManager();
+
+        $user = $entityManager->getRepository(User::class)->findOneBy(['pseudo' => $pseudo]);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
+
 }

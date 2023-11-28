@@ -29,6 +29,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/users, roles: ROLE_ADMIN }
+        - { path: ^/api/utilisateurs/, roles: PUBLIC_ACCESS }
         - { path: ^/api/publications, roles: PUBLIC_ACCESS }
         - { path: ^/api/commentaires, roles: PUBLIC_ACCESS }
         - { path: ^/api/ratingCommentaire, roles: PUBLIC_ACCESS }

@@ -50,8 +50,8 @@ class PublicationController extends AbstractController
             type: 'object',
             properties: [
                 new OA\Property(property: 'photo', type: 'string'),
-                new OA\Property(property: 'datePublication', type: 'datetime'),
-                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'datePublication', type: 'datetime', default: ''),
+                new OA\Property(property: 'description', type: 'string', default: 'votre description'),
                 new OA\Property(property: 'isLocked', type: 'boolean', default: false),
                 new OA\Property(property: 'auteur', type: 'string')
             ]
@@ -64,7 +64,7 @@ class PublicationController extends AbstractController
             properties: [
                 new OA\Property(property: 'photo', type: 'string'),
                 new OA\Property(property: 'datePublication', type: 'datetime', default: ''),
-                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'description', type: 'string', default: 'votre description'),
                 new OA\Property(property: 'isLocked', type: 'boolean', default: false),
                 new OA\Property(property: 'auteur', type: 'string', default: 'admin'),
             ]

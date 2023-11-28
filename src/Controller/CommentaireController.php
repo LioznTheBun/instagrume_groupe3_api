@@ -50,10 +50,11 @@ class CommentaireController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'contenu', type: 'string'),
-                new OA\Property(property: 'dateComm', type: 'datetime'),
-                new OA\Property(property: 'auteur', type: 'string'),
-                new OA\Property(property: 'publication', type: 'integer')
+                new OA\Property(property: 'contenu', type: 'string', default: 'votre commentaire'),
+                new OA\Property(property: 'dateComm', type: 'datetime', default: ''),
+                new OA\Property(property: 'auteur_id', type: 'number'),
+                new OA\Property(property: 'publication', type: 'number'),
+                new OA\Property(property: 'parentCommentId', type: 'number')
             ]
         )
     )]
@@ -62,10 +63,11 @@ class CommentaireController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'contenu', type: 'string'),
-                new OA\Property(property: 'dateComm', type: 'datetime'),
-                new OA\Property(property: 'auteur', type: 'string'),
-                new OA\Property(property: 'publication', type: 'integer')
+                new OA\Property(property: 'contenu', type: 'string', default: 'votre commentaire'),
+                new OA\Property(property: 'dateComm', type: 'datetime', default: ''),
+                new OA\Property(property: 'auteur_id', type: 'number'),
+                new OA\Property(property: 'publication', type: 'number'),
+                new OA\Property(property: 'parentCommentId', type: 'number')
             ]
         )
     )]
@@ -76,17 +78,18 @@ class CommentaireController extends AbstractController
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
 
-        $userRepo = $entityManager->getRepository(User::class);
-        $auteur = $userRepo->findOneBy(['pseudo' => $data['auteur']]);
-
-        $publicationRepo = $entityManager->getRepository(Publication::class);
-        $publication = $publicationRepo->findOneBy(['id' => $data['id']]);
-
         $commentaire = new Commentaire();
-        $commentaire->setAuteur($auteur);
         $commentaire->setContenu($data['contenu']);
-        $commentaire->setDateComm(new \DateTime($data['datePublication']));
-        $commentaire->setPublication($publication);
+        $commentaire->setDateComm(new \DateTime($data['dateComm']));
+
+        $userRepo = $entityManager->getRepository(User::class)->find($data['auteur_id']);
+        $commentaire->setAuteur($userRepo);
+
+        $publicationRepo = $entityManager->getRepository(Publication::class)->find($data['publication']);
+        $commentaire->setPublication($publicationRepo);
+
+        $commentaireBisRepo = $entityManager->getRepository(Commentaire::class)->find($data['parentCommentId']);
+        $commentaire->setCommentaire($commentaireBisRepo);
 
         $ratingCommentaire = new RatingCommentaire();
         $ratingCommentaire->setLikesCount(0);
@@ -100,6 +103,7 @@ class CommentaireController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($commentaire));
     }
+
 
 
 }
