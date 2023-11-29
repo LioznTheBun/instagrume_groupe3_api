@@ -139,7 +139,7 @@ class UserController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($user));
     }
 
-    #[Route('/api/createUser', methods: ['POST'])]
+    #[Route('/api/inscription', methods: ['POST'])]
     #[OA\Post(description: 'Crée un nouvel utilisateur et retourne ses informations')]
     #[OA\Response(
         response: 200,
@@ -177,6 +177,80 @@ class UserController extends AbstractController
         $user->setRoles($data['roles']);
 
 
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
+    #[Route('/api/changePass', methods: ['PUT'])]
+    #[OA\Put(description: "Modifie son mot de passe et retourne ses informations")]
+    #[OA\Response(
+        response: 200,
+        description: 'Le mot de passe mis à jour',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'id', type: 'string'),
+                new OA\Property(property: 'password', type: 'string')
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function updatePassword(ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+
+        $user = $doctrine->getRepository(User::class)->find($data['id']);
+
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+        $user->setPassword($hashedPassword);
+
+        if (!$user) {
+            return new Response('Utilisateur non trouvé', 404);
+        }
+
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
+    #[Route('/api/changeAvatar', methods: ['PUT'])]
+    #[OA\Put(description: "Modifie sa photo de profil et retourne ses informations")]
+    #[OA\Response(
+        response: 200,
+        description: "L'avatar mis à jour",
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'id', type: 'string'),
+                new OA\Property(property: 'avatar', type: 'string')
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function updateAvatar(ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+
+        $user = $doctrine->getRepository(User::class)->find($data['id']);
+
+        $user->setAvatar($data["avatar"]);
 
         $entityManager->persist($user);
         $entityManager->flush();

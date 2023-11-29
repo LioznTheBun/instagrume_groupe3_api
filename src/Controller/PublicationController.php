@@ -99,7 +99,7 @@ class PublicationController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($publication));
     }
-    //A MODIFIER ET ADAPTER ---------------------------------------------------------------------
+
     #[Route('/api/publications', methods: ['PUT'])]
     #[OA\Put(description: "Modifie la description d'une publication et retourne ses informations")]
     #[OA\Response(
@@ -141,10 +141,10 @@ class PublicationController extends AbstractController
     }
 
     #[Route('/api/publications/{id}', methods: ['DELETE'])]
-    #[OA\Delete(description: "Supprime une photo d'une publication correspondant à un identifiant")]
+    #[OA\Delete(description: "Supprime une publication correspondant à un identifiant")]
     #[OA\Response(
         response: 200,
-        description: 'La photo supprimée',
+        description: 'La publication supprimée',
         content: new OA\JsonContent(ref: new Model(type: Publication::class))
     )]
     #[OA\Parameter(
@@ -152,10 +152,10 @@ class PublicationController extends AbstractController
         in: 'path',
         schema: new OA\Schema(type: 'integer'),
         required: true,
-        description: 'L\'identifiant d\'une photo'
+        description: 'L\'identifiant d\'une publication'
     )]
     #[OA\Tag(name: 'Publications')]
-    public function deletePhoto(ManagerRegistry $doctrine, $id)
+    public function deletePublication(ManagerRegistry $doctrine, $id)
     {
         $entityManager = $doctrine->getManager();
 

@@ -7,7 +7,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Service\JsonConverter;
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\RatingCommentaire;
+use App\Entity\Commentaire;
 use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
 
@@ -36,6 +38,60 @@ class RatingComController extends AbstractController
         $ratingCommentaires = $entityManager->getRepository(RatingCommentaire::class)->findAll();
 
         return new Response($this->jsonConverter->encodeToJson($ratingCommentaires));
+    }
+
+    #[Route('/api/ratingCommentaire', methods: ['POST'])]
+    #[OA\Post(description: 'Met un like/dislike sur un commentaire et retourne ses informations.')]
+    #[OA\Response(
+        response: 200,
+        description: 'Le like/dislike créée',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'id', type: 'string'),
+                new OA\Property(property: 'commentaire_id', type: 'number'),
+                new OA\Property(property: 'likes_count', type: 'number'),
+                new OA\Property(property: 'dislikes_count', type: 'number')
+            ]
+        )
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'id', type: 'string'),
+                new OA\Property(property: 'commentaire_id', type: 'number'),
+                new OA\Property(property: 'action', type: 'string')
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Likes et dislikes commentaires')]
+    public function createRating(ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+
+        $commentaire = $doctrine->getRepository(RatingCommentaire::class)->find($data['commentaire_id']);
+        $commentaire = $doctrine->getRepository(RatingCommentaire::class)->find($data['id']);
+
+        if (!$commentaire) {
+            return new Response('Commentaire non trouvé', 404);
+        }
+
+
+        if ($data['action'] === 'like') {
+            $commentaire->setLikesCount($commentaire->getLikesCount() + 1);
+        } elseif ($data['action'] === 'dislike') {
+            $commentaire->setDislikesCount($commentaire->getDislikesCount() + 1);
+        } else {
+            return new Response('Action non valide', 400);
+        }
+
+        $entityManager->persist($commentaire);
+        $entityManager->flush();
+        return new Response($this->jsonConverter->encodeToJson($commentaire));
     }
 
 }

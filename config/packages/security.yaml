@@ -26,15 +26,16 @@ security:
             provider: app_user_provider
 
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/users, roles: ROLE_ADMIN }
-        - { path: ^/api/createUser, roles: PUBLIC_ACCESS }
+        - { path: ^/api/inscription, roles: PUBLIC_ACCESS }
         - { path: ^/api/utilisateurs/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/changePass, roles: ROLE_USER }
         - { path: ^/api/publications, roles: PUBLIC_ACCESS }
         - { path: ^/api/commentaires, roles: PUBLIC_ACCESS }
         - { path: ^/api/ratingCommentaire, roles: PUBLIC_ACCESS }
         - { path: ^/api/ratingPublication, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
 
 when@test:
