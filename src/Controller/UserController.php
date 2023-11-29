@@ -152,7 +152,7 @@ class UserController extends AbstractController
             type: 'object',
             properties: [
                 new OA\Property(property: 'email', type: 'string'),
-                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string')),
+                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), default: ["ROLE_USER"]),
                 new OA\Property(property: 'password', type: 'string', default: 'password'),
                 new OA\Property(property: 'avatar', type: 'string'),
                 new OA\Property(property: 'pseudo', type: 'string'),
