@@ -59,18 +59,14 @@ class UserController extends AbstractController
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
 
-        if (!is_array($data) || $data == null || empty($data['email']) || empty($data['password'])) {
-            return new Response('Identifiants invalides', 401);
-        }
-
         $entityManager = $doctrine->getManager();
         $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $data['email']]);
 
         if (!$user) {
-            throw $this->createNotFoundException();
+            return new Response($this->jsonConverter->encodeToJson("Identifiants Invalides."));
         }
         if (!$this->passwordHasher->isPasswordValid($user, $data['password'])) {
-            return new Response('Identifiants invalides', 401);
+            return new Response($this->jsonConverter->encodeToJson("Identifiants Invalides."));
         }
 
         $token = $JWTManager->create($user);
@@ -176,10 +172,7 @@ class UserController extends AbstractController
             $user->setEmail($data['email']);
             $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
-            if ($data['avatar'] != "")
-                $user->setAvatar($data['avatar']);
-            else
-                $user->setAvatar("default.png");
+            $user->setAvatar("default.png");
             $user->setPseudo($data['pseudo']);
             $user->setIsBanned(false);
             $user->setRoles(["ROLE_USER"]);
