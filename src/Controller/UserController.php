@@ -151,12 +151,10 @@ class UserController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'email', type: 'string'),
-                new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string'), default: ["ROLE_USER"]),
+                new OA\Property(property: 'email', type: 'string', default: 'test@gmail'),
                 new OA\Property(property: 'password', type: 'string', default: 'password'),
-                new OA\Property(property: 'avatar', type: 'string'),
-                new OA\Property(property: 'pseudo', type: 'string'),
-                new OA\Property(property: 'is_banned', type: 'boolean', default: false)
+                new OA\Property(property: 'avatar', type: 'string', default: ''),
+                new OA\Property(property: 'pseudo', type: 'string', default: 'Test'),
             ]
         )
     )]
@@ -167,21 +165,30 @@ class UserController extends AbstractController
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
 
-        $user = new User();
-        $user->setEmail($data['email']);
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
-        $user->setPassword($hashedPassword);
-        $user->setAvatar($data['avatar']);
-        $user->setPseudo($data['pseudo']);
-        $user->setIsBanned($data['is_banned']);
-        $user->setRoles($data['roles']);
+        if ($doctrine->getRepository(User::class)->findOneBy(['email' => $data['email']])) {
 
+            return new Response($this->jsonConverter->encodeToJson("Cet email est déjà utilisé."));
+        } elseif ($doctrine->getRepository(User::class)->findOneBy(['pseudo' => $data['pseudo']])) {
 
+            return new Response($this->jsonConverter->encodeToJson("Ce pseudo est déjà pris."));
+        } else {
+            $user = new User();
+            $user->setEmail($data['email']);
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+            $user->setPassword($hashedPassword);
+            if ($data['avatar'] != "")
+                $user->setAvatar($data['avatar']);
+            else
+                $user->setAvatar("default.png");
+            $user->setPseudo($data['pseudo']);
+            $user->setIsBanned(false);
+            $user->setRoles(["ROLE_USER"]);
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        return new Response($this->jsonConverter->encodeToJson($user));
+            return new Response($this->jsonConverter->encodeToJson("Le compte a été crée."));
+        }
     }
 
     #[Route('/api/changePass', methods: ['PUT'])]
@@ -257,6 +264,4 @@ class UserController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($user));
     }
-
-
 }
