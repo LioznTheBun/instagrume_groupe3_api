@@ -257,4 +257,38 @@ class UserController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($user));
     }
+
+    #[Route('/api/user/{id}', methods: ['GET'])]
+    #[OA\Get(description: 'Retourne toutes les informations d\'un utilisateur')]
+    #[OA\Response(
+        response: 200,
+        description: 'Toutes les informations d\'un utilisateur',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'string'),
+        required: true,
+        description: 'L\'identifiant de l\'utilisateur'
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function getUserDetails(ManagerRegistry $doctrine, $id)
+    {
+        $entityManager = $doctrine->getManager();
+
+        $user = $entityManager->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return new Response($this->jsonConverter->encodeToJson("Utilisateur non trouvé"), 404);
+        }
+
+        $userData = [
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
+            'pseudo' => $user->getPseudo(),
+        ];
+
+        return new Response($this->jsonConverter->encodeToJson($userData));
+    }
 }

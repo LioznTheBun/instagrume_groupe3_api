@@ -35,6 +35,7 @@ security:
         - { path: ^/api/commentaires, roles: PUBLIC_ACCESS }
         - { path: ^/api/ratingCommentaire, roles: PUBLIC_ACCESS }
         - { path: ^/api/ratingPublication, roles: PUBLIC_ACCESS }
+        - { path: ^/api/user, roles: PUBLIC_ACCESS }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/myself, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }

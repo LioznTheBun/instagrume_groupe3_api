@@ -167,4 +167,33 @@ class PublicationController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($publication));
     }
 
+    #[Route('/api/publications/{id}', methods: ['GET'])]
+    #[OA\Get(description: "Retourne une publication correspondant à un identifiant")]
+    #[OA\Response(
+        response: 200,
+        description: 'La publication retournée',
+        content: new OA\JsonContent(ref: new Model(type: Publication::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'une publication'
+    )]
+    #[OA\Tag(name: 'Publications')]
+    public function getPublicationById(ManagerRegistry $doctrine, $id)
+    {
+        $entityManager = $doctrine->getManager();
+
+        $publication = $entityManager->getRepository(Publication::class)->find($id);
+
+        if (!$publication) {
+            throw $this->createNotFoundException('Publication not found');
+        }
+
+
+        return new Response($this->jsonConverter->encodeToJson($publication));
+    }
+
 }
