@@ -291,4 +291,31 @@ class UserController extends AbstractController
 
         return new Response($this->jsonConverter->encodeToJson($userData));
     }
+
+    
+    #[Route('/api/ban/{userId}', methods: ['PUT'])]
+    public function banUser($userId, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $user = $doctrine->getRepository(User::class)->find($userId);
+        $user->setIsBanned(1);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'success']);
+    }
+
+    #[Route('/api/unban/{userId}', methods: ['PUT'])]
+    public function unbanUser($userId, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $user = $doctrine->getRepository(User::class)->find($userId);
+        $user->setIsBanned(0);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'success']);
+    }
 }
