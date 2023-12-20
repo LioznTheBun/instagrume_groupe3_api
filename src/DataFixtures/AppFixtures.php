@@ -32,10 +32,10 @@ class AppFixtures extends Fixture
         $manager->persist($userAdmin);
 
         $utilisateur1 = new User();
-        $utilisateur1->setPseudo('user');
+        $utilisateur1->setPseudo('Quentin');
         $utilisateur1->setRoles(["ROLE_USER"]);
         $utilisateur1->setAvatar("image1.png");
-        $utilisateur1->setEmail("user@user.fr");
+        $utilisateur1->setEmail("quentin@quentin.fr");
         $utilisateur1->setIsBanned(false);
         $utilisateur1->setPassword($this->passwordHasher->hashPassword($utilisateur1, 'password'));
         $manager->persist($utilisateur1);
@@ -60,34 +60,34 @@ class AppFixtures extends Fixture
 
         //création des publications
         $publication1 = new Publication();
-        $publication1->setAuteur($userAdmin);
+        $publication1->setAuteur($utilisateur2);
         $publication1->setDatePublication(new \DateTime('2023-11-15 07:33:40'));
-        $publication1->setDescription('Jolie photo de raisins');
+        $publication1->setDescription('Enfin des fruits de saison !');
         $publication1->setIsLocked(false);
-        $publication1->setPhoto('image');
+        $publication1->setPhoto('image_post1.png');
         $manager->persist($publication1);
 
         $publication2 = new Publication();
         $publication2->setAuteur($utilisateur1);
         $publication2->setDatePublication(new \DateTime('2023-11-18 14:25:40'));
-        $publication2->setDescription("Ce matin j'ai récolté de belles carottes, regardez !");
+        $publication2->setDescription("Ce matin j'ai récolté de belles mangues, regardez !");
         $publication2->setIsLocked(false);
-        $publication2->setPhoto('image');
+        $publication2->setPhoto('image_post2.png');
         $manager->persist($publication2);
 
         $publication3 = new Publication();
         $publication3->setAuteur($utilisateur2);
         $publication3->setDatePublication(new \DateTime('2023-12-01 17:02:1'));
-        $publication3->setDescription("De très belles tomates, fraichement ramassées !");
+        $publication3->setDescription("Une très belle pomme, elle attend juste d'être ramassée !");
         $publication3->setIsLocked(false);
-        $publication3->setPhoto('image');
+        $publication3->setPhoto('image_post3.png');
         $manager->persist($publication3);
 
         //création des commentaires
         $commentaire1 = new Commentaire();
         $commentaire1->setContenu("Très belle photo");
         $commentaire1->setDateComm(new \DateTime('2023-11-15 08:33:40'));
-        $commentaire1->setAuteur($userAdmin);
+        $commentaire1->setAuteur($utilisateur1);
         $commentaire1->setPublication($publication1);
         $manager->persist($commentaire1);
 
@@ -108,7 +108,7 @@ class AppFixtures extends Fixture
         $reponseCommentaire1 = new Commentaire();
         $reponseCommentaire1->setContenu("Non elle n'est pas si belle");
         $reponseCommentaire1->setDateComm(new \DateTime('2023-11-15 09:33:40'));
-        $reponseCommentaire1->setAuteur($userAdmin);
+        $reponseCommentaire1->setAuteur($utilisateur3);
         $reponseCommentaire1->setPublication($publication1);
         $reponseCommentaire1->setCommentaire($commentaire1);
         $manager->persist($reponseCommentaire1);
