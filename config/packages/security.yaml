@@ -40,6 +40,8 @@ security:
         - { path: ^/api/myself, roles: PUBLIC_ACCESS }
         - { path: ^/api/ban, roles: PUBLIC_ACCESS }
         - { path: ^/api/unban, roles: PUBLIC_ACCESS }
+        - { path: ^/api/lock, roles: PUBLIC_ACCESS }
+        - { path: ^/api/unlock, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
 
 when@test:

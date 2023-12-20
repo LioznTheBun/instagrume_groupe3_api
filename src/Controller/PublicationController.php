@@ -13,6 +13,7 @@ use App\Entity\RatingPublication;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PublicationController extends AbstractController
 {
@@ -196,4 +197,29 @@ class PublicationController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($publication));
     }
 
+    #[Route('/api/lock/{postId}', methods: ['PUT'])]
+    public function lockpost($postId, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $post = $doctrine->getRepository(Publication::class)->find($postId);
+        $post->setIsLocked(1);
+
+        $entityManager->persist($post);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'success']);
+    }
+
+    #[Route('/api/unlock/{postId}', methods: ['PUT'])]
+    public function unlockpost($postId, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
+        $post = $doctrine->getRepository(Publication::class)->find($postId);
+        $post->setIsLocked(0);
+
+        $entityManager->persist($post);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'success']);
+    }
 }
