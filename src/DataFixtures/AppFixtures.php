@@ -25,7 +25,7 @@ class AppFixtures extends Fixture
         $userAdmin = new User();
         $userAdmin->setPseudo('admin');
         $userAdmin->setRoles(["ROLE_ADMIN"]);
-        $userAdmin->setAvatar("image");
+        $userAdmin->setAvatar("default.png");
         $userAdmin->setEmail("admin@admin.fr");
         $userAdmin->setIsBanned(false);
         $userAdmin->setPassword($this->passwordHasher->hashPassword($userAdmin, 'password'));
@@ -34,7 +34,7 @@ class AppFixtures extends Fixture
         $utilisateur1 = new User();
         $utilisateur1->setPseudo('user');
         $utilisateur1->setRoles(["ROLE_USER"]);
-        $utilisateur1->setAvatar("image");
+        $utilisateur1->setAvatar("image1.png");
         $utilisateur1->setEmail("user@user.fr");
         $utilisateur1->setIsBanned(false);
         $utilisateur1->setPassword($this->passwordHasher->hashPassword($utilisateur1, 'password'));
@@ -43,7 +43,7 @@ class AppFixtures extends Fixture
         $utilisateur2 = new User();
         $utilisateur2->setPseudo('Hugo');
         $utilisateur2->setRoles(["ROLE_USER"]);
-        $utilisateur2->setAvatar("image");
+        $utilisateur2->setAvatar("image2.png");
         $utilisateur2->setEmail("hugo@hugo.fr");
         $utilisateur2->setIsBanned(false);
         $utilisateur2->setPassword($this->passwordHasher->hashPassword($utilisateur2, 'password'));
@@ -52,7 +52,7 @@ class AppFixtures extends Fixture
         $utilisateur3 = new User();
         $utilisateur3->setPseudo('Baptiste');
         $utilisateur3->setRoles(["ROLE_USER"]);
-        $utilisateur3->setAvatar("image");
+        $utilisateur3->setAvatar("image3.png");
         $utilisateur3->setEmail("baptiste@baptiste.fr");
         $utilisateur3->setIsBanned(false);
         $utilisateur3->setPassword($this->passwordHasher->hashPassword($utilisateur3, 'password'));

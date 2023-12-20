@@ -174,10 +174,17 @@ class UserController extends AbstractController
             $user->setEmail($data['email']);
             $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
             $user->setPassword($hashedPassword);
-            $user->setAvatar("default.png");
             $user->setPseudo($data['pseudo']);
             $user->setIsBanned(false);
             $user->setRoles(["ROLE_USER"]);
+
+            $imageBase64 = $data['avatar'];
+            $image = base64_decode($imageBase64);
+            $imageName = uniqid() . '.png';
+            file_put_contents(__DIR__ . '/../../public/img/' . $imageName, $image);
+
+            $user->setAvatar($imageName);
+            //$user->setAvatar("default.png");
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -297,7 +304,7 @@ class UserController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($userData));
     }
 
-    
+
     #[Route('/api/ban/{userId}', methods: ['PUT'])]
     public function banUser($userId, ManagerRegistry $doctrine)
     {
