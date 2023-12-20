@@ -81,13 +81,15 @@ class UserController extends AbstractController
         content: new OA\JsonContent(ref: new Model(type: User::class))
     )]
     #[OA\Tag(name: 'Utilisateurs')]
-    public function getUtilisateur(JWTEncoderInterface $jwtEncoder, Request $request)
+    public function getUtilisateur(ManagerRegistry $doctrine, JWTEncoderInterface $jwtEncoder, Request $request)
     {
+        $entityManager = $doctrine->getManager();
         $tokenString = str_replace('Bearer ', '', $request->headers->get('Authorization'));
 
         $user = $jwtEncoder->decode($tokenString);
-
-        return new Response($this->jsonConverter->encodeToJson($user));
+        $email = $user['username'];
+        $userData = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+        return new Response($this->jsonConverter->encodeToJson($userData));
     }
 
     #[Route('/api/users', methods: ['GET'])]
@@ -287,6 +289,9 @@ class UserController extends AbstractController
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
             'pseudo' => $user->getPseudo(),
+            'roles' => $user->getRoles(),
+            'is_banned' => $user->isIsBanned(),
+            'id' => $user->getId()
         ];
 
         return new Response($this->jsonConverter->encodeToJson($userData));
