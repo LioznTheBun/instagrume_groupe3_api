@@ -24,16 +24,15 @@ class Commentaire
     #[ORM\JoinColumn(nullable: false)]
     private ?User $auteur = null;
 
-    #[ORM\OneToOne(targetEntity: Commentaire::class)]
-    #[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true)]
-    private ?Commentaire $commentaire = null;
-
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Publication $publication = null;
 
     #[ORM\OneToOne(mappedBy: 'commentaire', cascade: ['persist', 'remove'])]
     private ?RatingCommentaire $ratingCommentaire = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $parentCommentId = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -75,18 +74,6 @@ class Commentaire
         return $this;
     }
 
-    public function getCommentaire(): ?self
-    {
-        return $this->commentaire;
-    }
-
-    public function setCommentaire(?self $commentaire): static
-    {
-        $this->commentaire = $commentaire;
-
-        return $this;
-    }
-
     public function getPublication(): ?Publication
     {
         return $this->publication;
@@ -112,6 +99,18 @@ class Commentaire
         }
 
         $this->ratingCommentaire = $ratingCommentaire;
+
+        return $this;
+    }
+
+    public function getParentCommentId(): ?int
+    {
+        return $this->parentCommentId;
+    }
+
+    public function setParentCommentId(?int $parentCommentId): static
+    {
+        $this->parentCommentId = $parentCommentId;
 
         return $this;
     }

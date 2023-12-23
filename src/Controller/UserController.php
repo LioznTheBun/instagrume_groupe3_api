@@ -306,6 +306,20 @@ class UserController extends AbstractController
 
 
     #[Route('/api/ban/{userId}', methods: ['PUT'])]
+    #[OA\Get(description: "Ban un utilisateur.")]
+    #[OA\Response(
+        response: 200,
+        description: 'L\'utilisateur est ban.',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'un utilisateur'
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
     public function banUser($userId, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
@@ -319,6 +333,20 @@ class UserController extends AbstractController
     }
 
     #[Route('/api/unban/{userId}', methods: ['PUT'])]
+    #[OA\Get(description: "Retire le ban d'un utilisateur.")]
+    #[OA\Response(
+        response: 200,
+        description: 'L\'utilisateur est déban.',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'un utilisateur'
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
     public function unbanUser($userId, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();

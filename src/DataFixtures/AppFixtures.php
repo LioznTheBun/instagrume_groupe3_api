@@ -110,7 +110,7 @@ class AppFixtures extends Fixture
         $reponseCommentaire1->setDateComm(new \DateTime('2023-11-15 09:33:40'));
         $reponseCommentaire1->setAuteur($utilisateur3);
         $reponseCommentaire1->setPublication($publication1);
-        $reponseCommentaire1->setCommentaire($commentaire1);
+        $reponseCommentaire1->setParentCommentId(1);
         $manager->persist($reponseCommentaire1);
 
         $reponseCommentaire2 = new Commentaire();
@@ -118,7 +118,7 @@ class AppFixtures extends Fixture
         $reponseCommentaire2->setDateComm(new \DateTime('2023-11-15 09:33:40'));
         $reponseCommentaire2->setAuteur($utilisateur3);
         $reponseCommentaire2->setPublication($publication2);
-        $reponseCommentaire2->setCommentaire($commentaire2);
+        $reponseCommentaire2->setParentCommentId(2);
         $manager->persist($reponseCommentaire2);
 
         $reponseCommentaire3 = new Commentaire();
@@ -126,7 +126,7 @@ class AppFixtures extends Fixture
         $reponseCommentaire3->setDateComm(new \DateTime('2023-11-15 09:33:40'));
         $reponseCommentaire3->setAuteur($utilisateur2);
         $reponseCommentaire3->setPublication($publication3);
-        $reponseCommentaire3->setCommentaire($commentaire3);
+        $reponseCommentaire3->setParentCommentId(3);
         $manager->persist($reponseCommentaire3);
 
         //création rating commentaires

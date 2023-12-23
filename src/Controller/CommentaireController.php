@@ -87,15 +87,13 @@ class CommentaireController extends AbstractController
 
         $publicationRepo = $entityManager->getRepository(Publication::class)->find($data['publication']);
         $commentaire->setPublication($publicationRepo);
-
-        $commentaireBisRepo = $entityManager->getRepository(Commentaire::class)->find($data['parentCommentId']);
-        $commentaire->setCommentaire($commentaireBisRepo);
+        
+        $commentaire->setParentCommentId($data['parentCommentId']);
 
         $ratingCommentaire = new RatingCommentaire();
         $ratingCommentaire->setLikesCount(0);
         $ratingCommentaire->setDislikesCount(0);
         $ratingCommentaire->setCommentaire($commentaire);
-
 
         $entityManager->persist($commentaire);
         $entityManager->persist($ratingCommentaire);

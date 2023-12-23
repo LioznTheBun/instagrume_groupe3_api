@@ -198,6 +198,20 @@ class PublicationController extends AbstractController
     }
 
     #[Route('/api/lock/{postId}', methods: ['PUT'])]
+    #[OA\Get(description: "Lock une publication.")]
+    #[OA\Response(
+        response: 200,
+        description: 'La publication est bloqué.',
+        content: new OA\JsonContent(ref: new Model(type: Publication::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'une publication'
+    )]
+    #[OA\Tag(name: 'Publications')]
     public function lockpost($postId, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
@@ -211,6 +225,20 @@ class PublicationController extends AbstractController
     }
 
     #[Route('/api/unlock/{postId}', methods: ['PUT'])]
+    #[OA\Get(description: "Unlock une publication.")]
+    #[OA\Response(
+        response: 200,
+        description: 'La publication est débloqué.',
+        content: new OA\JsonContent(ref: new Model(type: Publication::class))
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant d\'une publication'
+    )]
+    #[OA\Tag(name: 'Publications')]
     public function unlockpost($postId, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
