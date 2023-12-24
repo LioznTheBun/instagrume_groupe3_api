@@ -259,7 +259,12 @@ class UserController extends AbstractController
 
         $user = $doctrine->getRepository(User::class)->find($data['id']);
 
-        $user->setAvatar($data["avatar"]);
+        $imageBase64 = $data['avatar'];
+        $image = base64_decode($imageBase64);
+        $imageName = uniqid() . '.png';
+        file_put_contents(__DIR__ . '/../../public/avatar/' . $imageName, $image);
+
+        $user->setAvatar($imageName);
 
         $entityManager->persist($user);
         $entityManager->flush();
