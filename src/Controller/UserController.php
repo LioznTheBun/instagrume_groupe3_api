@@ -309,6 +309,47 @@ class UserController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($userData));
     }
 
+    #[Route('/api/user/{id}/details', methods: ['GET'])]
+    #[OA\Get(description: 'Retourne toutes les informations d\'un utilisateur avec ses publications et commentaires')]
+    #[OA\Response(
+        response: 200,
+        description: 'Toutes les informations de l\'utilisateur avec publications et commentaires',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'user', ref: new Model(type: User::class)),
+                new OA\Property(property: 'publications', type: 'array', items: new OA\Items(ref: new Model(type: Publication::class))),
+                new OA\Property(property: 'commentaires', type: 'array', items: new OA\Items(ref: new Model(type: Commentaire::class)))
+            ]
+        )
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        in: 'path',
+        schema: new OA\Schema(type: 'integer'),
+        required: true,
+        description: 'L\'identifiant de l\'utilisateur'
+    )]
+    #[OA\Tag(name: 'Utilisateurs')]
+    public function getUserDetailsWithPublicationsAndCommentaires(ManagerRegistry $doctrine, $id)
+    {
+        $entityManager = $doctrine->getManager();
+
+        $user = $entityManager->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            return new Response($this->jsonConverter->encodeToJson("Utilisateur non trouvé"), 404);
+        }
+
+        $userData = [
+            'user' => $user,
+            'publications' => $user->getPublications(),
+            'commentaires' => $user->getCommentaires()
+        ];
+
+        return new Response($this->jsonConverter->encodeToJson($userData));
+    }
+
 
     #[Route('/api/ban/{userId}', methods: ['PUT'])]
     #[OA\Get(description: "Ban un utilisateur.")]
