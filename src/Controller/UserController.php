@@ -184,7 +184,6 @@ class UserController extends AbstractController
             file_put_contents(__DIR__ . '/../../public/img/' . $imageName, $image);
 
             $user->setAvatar($imageName);
-            //$user->setAvatar("default.png");
 
             $entityManager->persist($user);
             $entityManager->flush();

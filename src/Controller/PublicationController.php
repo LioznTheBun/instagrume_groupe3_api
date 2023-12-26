@@ -42,7 +42,7 @@ class PublicationController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($publications));
     }
 
-    #[Route('/api/publications', methods: ['POST'])]
+    #[Route('/api/createPublication', methods: ['POST'])]
     #[OA\Post(description: 'Crée une nouvelle publication et retourne ses informations.')]
     #[OA\Response(
         response: 200,
@@ -86,7 +86,12 @@ class PublicationController extends AbstractController
         $publication->setDescription($data['description']);
         $publication->setDatePublication(new \DateTime($data['datePublication']));
         $publication->setIsLocked($data['isLocked']);
-        $publication->setPhoto($data['photo']);
+
+        $imageBase64 = $data['photo'];
+        $image = base64_decode($imageBase64);
+        $imageName = uniqid() . '.png';
+        file_put_contents(__DIR__ . '/../../public/img/' . $imageName, $image);
+        $publication->setPhoto($imageName);
 
         $ratingPublication = new RatingPublication();
         $ratingPublication->setLikesCount(0);
