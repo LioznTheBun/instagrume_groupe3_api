@@ -102,8 +102,8 @@ class CommentaireController extends AbstractController
         return new Response($this->jsonConverter->encodeToJson($commentaire));
     }
 
-    #[Route('/api/commentaires', methods: ['PUT'])]
-    #[OA\Put(description: "Modifie le contenu d'un commentaire et retourne ses informations")]
+    #[Route('/api/editComment', methods: ['POST'])]
+    #[OA\Post(description: "Modifie le contenu d'un commentaire et retourne ses informations")]
     #[OA\Response(
         response: 200,
         description: 'Le commentaire mis à jour',
