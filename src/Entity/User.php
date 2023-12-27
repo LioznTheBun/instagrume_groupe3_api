@@ -47,10 +47,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isBanned = null;
 
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: ArrayRatingCom::class, orphanRemoval: true)]
+    private Collection $arrayRatingComs;
+
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: ArrayRatingPost::class, orphanRemoval: true)]
+    private Collection $arrayRatingPosts;
+
     public function __construct()
     {
         $this->publications = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->arrayRatingComs = new ArrayCollection();
+        $this->arrayRatingPosts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -215,6 +223,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsBanned(bool $isBanned): static
     {
         $this->isBanned = $isBanned;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArrayRatingCom>
+     */
+    public function getArrayRatingComs(): Collection
+    {
+        return $this->arrayRatingComs;
+    }
+
+    public function addArrayRatingCom(ArrayRatingCom $arrayRatingCom): static
+    {
+        if (!$this->arrayRatingComs->contains($arrayRatingCom)) {
+            $this->arrayRatingComs->add($arrayRatingCom);
+            $arrayRatingCom->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArrayRatingCom(ArrayRatingCom $arrayRatingCom): static
+    {
+        if ($this->arrayRatingComs->removeElement($arrayRatingCom)) {
+            // set the owning side to null (unless already changed)
+            if ($arrayRatingCom->getUserId() === $this) {
+                $arrayRatingCom->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArrayRatingPost>
+     */
+    public function getArrayRatingPosts(): Collection
+    {
+        return $this->arrayRatingPosts;
+    }
+
+    public function addArrayRatingPost(ArrayRatingPost $arrayRatingPost): static
+    {
+        if (!$this->arrayRatingPosts->contains($arrayRatingPost)) {
+            $this->arrayRatingPosts->add($arrayRatingPost);
+            $arrayRatingPost->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArrayRatingPost(ArrayRatingPost $arrayRatingPost): static
+    {
+        if ($this->arrayRatingPosts->removeElement($arrayRatingPost)) {
+            // set the owning side to null (unless already changed)
+            if ($arrayRatingPost->getUserId() === $this) {
+                $arrayRatingPost->setUserId(null);
+            }
+        }
 
         return $this;
     }

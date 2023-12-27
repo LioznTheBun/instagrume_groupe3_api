@@ -42,6 +42,8 @@ security:
         - { path: ^/api/unban, roles: PUBLIC_ACCESS }
         - { path: ^/api/lock, roles: PUBLIC_ACCESS }
         - { path: ^/api/unlock, roles: PUBLIC_ACCESS }
+        - { path: ^/api/arrayRatingPost, roles: PUBLIC_ACCESS }
+        - { path: ^/api/arrayRatingCom, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: ROLE_USER }
 
 when@test:
