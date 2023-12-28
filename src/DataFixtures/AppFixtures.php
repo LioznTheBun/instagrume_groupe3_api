@@ -142,6 +142,12 @@ class AppFixtures extends Fixture
         $ratingCommentaire2->setDislikesCount(0);
         $manager->persist($ratingCommentaire2);
 
+        $ratingCommentaire3 = new RatingCommentaire();
+        $ratingCommentaire3->setCommentaire($commentaire3);
+        $ratingCommentaire3->setLikesCount(0);
+        $ratingCommentaire3->setDislikesCount(0);
+        $manager->persist($ratingCommentaire3);
+
         //création rating publications
         $ratingPublication1 = new RatingPublication();
         $ratingPublication1->setPublication($publication1);

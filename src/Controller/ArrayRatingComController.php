@@ -14,6 +14,7 @@ use App\Entity\Commentaire;
 use App\Entity\RatingCommentaire;
 use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ArrayRatingComController extends AbstractController
 {
@@ -75,6 +76,7 @@ class ArrayRatingComController extends AbstractController
 		$request = Request::createFromGlobals();
 		$data = json_decode($request->getContent(), true);
 		$arrayExisted = true;
+		$arrayDeleted = false;
 
 		$ratingCommentaire = $doctrine->getRepository(RatingCommentaire::class)->find($data['commentaire_id']);
 		$user = $doctrine->getRepository(User::class)->find($data['user_id']);
@@ -91,19 +93,20 @@ class ArrayRatingComController extends AbstractController
 			$arrayExisted = false;
 		}
 
+		//TODO: Erreur sur le changement de dislike à like
+
 		if ($data['action'] === 'like') {
 			if ($array->isLiked() == false && $arrayExisted) {
 				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() - 1);
 			}
-			if ($array->isLiked() == true) {
+			if ($array->isLiked() == true && $arrayExisted) {
 				$entityManager->remove($array);
+				$arrayDeleted = true;
+				$ratingCommentaire->setLikesCount($ratingCommentaire->getLikesCount() - 1);
 			} else {
 				$array->setLiked(true);
 				$ratingCommentaire->setLikesCount($ratingCommentaire->getLikesCount() + 1);
 				$entityManager->persist($array);
-			}
-			if ($arrayExisted) {
-				$ratingCommentaire->setLikesCount($ratingCommentaire->getLikesCount() - 1);
 			}
 		} elseif ($data['action'] === 'dislike') {
 			if ($array->isLiked() == true && $arrayExisted) {
@@ -111,6 +114,7 @@ class ArrayRatingComController extends AbstractController
 			}
 			if ($array->isLiked() == false && $arrayExisted) {
 				$entityManager->remove($array);
+				$arrayDeleted = true;
 				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() - 1);
 			} else {
 				$array->setLiked(false);
@@ -124,6 +128,17 @@ class ArrayRatingComController extends AbstractController
 
 		$entityManager->persist($ratingCommentaire);
 		$entityManager->flush();
-		return new Response($this->jsonConverter->encodeToJson($ratingCommentaire));
+		if ($arrayDeleted){
+			return new JsonResponse(([
+				'likes_count' => $ratingCommentaire->getLikesCount(),
+				'dislikes_count' => $ratingCommentaire->getDislikesCount(),
+				'user_liked' => 'suppr'
+			]));
+		}
+		return new JsonResponse(([
+			'likes_count' => $ratingCommentaire->getLikesCount(),
+			'dislikes_count' => $ratingCommentaire->getDislikesCount(),
+			'user_liked' => $array->isLiked()
+		]));
 	}
 }

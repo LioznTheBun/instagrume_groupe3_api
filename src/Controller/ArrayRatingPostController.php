@@ -13,6 +13,7 @@ use App\Entity\User;
 use App\Entity\RatingPublication;
 use OpenApi\Attributes as OA;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ArrayRatingPostController extends AbstractController
 {
@@ -76,6 +77,7 @@ class ArrayRatingPostController extends AbstractController
 		$request = Request::createFromGlobals();
 		$data = json_decode($request->getContent(), true);
 		$arrayExisted = true;
+		$arrayDeleted = false;
 
 		$ratingPublication = $doctrine->getRepository(RatingPublication::class)->find($data['publication_id']);
 		$user = $doctrine->getRepository(User::class)->find($data['user_id']);
@@ -98,6 +100,7 @@ class ArrayRatingPostController extends AbstractController
 			}
 			if ($array->isLiked() == true && $arrayExisted) {
 				$entityManager->remove($array);
+				$arrayDeleted = true;
 				$ratingPublication->setLikesCount($ratingPublication->getLikesCount() - 1);
 			} else {
 				$array->setLiked(true);
@@ -110,6 +113,7 @@ class ArrayRatingPostController extends AbstractController
 			}
 			if ($array->isLiked() == false && $arrayExisted) {
 				$entityManager->remove($array);
+				$arrayDeleted = true;
 				$ratingPublication->setDislikesCount($ratingPublication->getDislikesCount() - 1);
 			} else {
 				$array->setLiked(false);
@@ -122,6 +126,17 @@ class ArrayRatingPostController extends AbstractController
 
 		$entityManager->persist($ratingPublication);
 		$entityManager->flush();
-		return new Response($this->jsonConverter->encodeToJson($ratingPublication));
+		if ($arrayDeleted){
+			return new JsonResponse(([
+				'likes_count' => $ratingPublication->getLikesCount(),
+				'dislikes_count' => $ratingPublication->getDislikesCount(),
+				'user_liked' => 'suppr'
+			]));
+		}
+		return new JsonResponse(([
+			'likes_count' => $ratingPublication->getLikesCount(),
+			'dislikes_count' => $ratingPublication->getDislikesCount(),
+			'user_liked' => $array->isLiked()
+		]));
 	}
 }
