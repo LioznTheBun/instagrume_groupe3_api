@@ -93,26 +93,28 @@ class ArrayRatingPostController extends AbstractController
 		}
 
 		if ($data['action'] === 'like') {
-			if ($array->isLiked() == true) {
+			if ($array->isLiked() == false && $arrayExisted) {
+				$ratingPublication->setDislikesCount($ratingPublication->getDislikesCount() - 1);
+			}
+			if ($array->isLiked() == true && $arrayExisted) {
 				$entityManager->remove($array);
+				$ratingPublication->setLikesCount($ratingPublication->getLikesCount() - 1);
 			} else {
 				$array->setLiked(true);
 				$ratingPublication->setLikesCount($ratingPublication->getLikesCount() + 1);
 				$entityManager->persist($array);
 			}
-			if ($arrayExisted) {
+		} elseif ($data['action'] === 'dislike') {
+			if ($array->isLiked() == true && $arrayExisted) {
 				$ratingPublication->setLikesCount($ratingPublication->getLikesCount() - 1);
 			}
-		} elseif ($data['action'] === 'dislike') {
 			if ($array->isLiked() == false && $arrayExisted) {
 				$entityManager->remove($array);
+				$ratingPublication->setDislikesCount($ratingPublication->getDislikesCount() - 1);
 			} else {
 				$array->setLiked(false);
 				$ratingPublication->setDislikesCount($ratingPublication->getDislikesCount() + 1);
 				$entityManager->persist($array);
-			}
-			if ($arrayExisted) {
-				$ratingPublication->setDislikesCount($ratingPublication->getDislikesCount() - 1);
 			}
 		} else {
 			return new Response('Action non valide', 400);

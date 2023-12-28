@@ -92,6 +92,9 @@ class ArrayRatingComController extends AbstractController
 		}
 
 		if ($data['action'] === 'like') {
+			if ($array->isLiked() == false && $arrayExisted) {
+				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() - 1);
+			}
 			if ($array->isLiked() == true) {
 				$entityManager->remove($array);
 			} else {
@@ -103,16 +106,18 @@ class ArrayRatingComController extends AbstractController
 				$ratingCommentaire->setLikesCount($ratingCommentaire->getLikesCount() - 1);
 			}
 		} elseif ($data['action'] === 'dislike') {
+			if ($array->isLiked() == true && $arrayExisted) {
+				$ratingCommentaire->setLikesCount($ratingCommentaire->getLikesCount() - 1);
+			}
 			if ($array->isLiked() == false && $arrayExisted) {
 				$entityManager->remove($array);
+				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() - 1);
 			} else {
 				$array->setLiked(false);
 				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() + 1);
 				$entityManager->persist($array);
 			}
-			if ($arrayExisted) {
-				$ratingCommentaire->setDislikesCount($ratingCommentaire->getDislikesCount() - 1);
-			}
+
 		} else {
 			return new Response('Action non valide', 400);
 		}
