@@ -14,3 +14,5 @@ symfony server:start -d --no-tls --port=3000
 
 Arrêt
 symfony server:stop
+
+Url : localhost:3000/api/doc
